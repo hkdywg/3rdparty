@@ -26,10 +26,11 @@ else()
 endif()
 
 set(CMAKE_INSTALL_PREFIX ${THIRDPARTY_ROOT}/install)
-set(3RDPARTY_INSTALL_PATH ${THIRDPARTY_ROOT}/install)
+set(THIRDPARTY_INSTALL_PATH ${THIRDPARTY_ROOT}/install)
 
+include(ExternalProject)
 include(ProjectPatch)
-include(3rdpartyCache)
+include(ThirdpartyCache)
 
 find_program(CHRPATH_EXECUTABLE chrpath)
 
