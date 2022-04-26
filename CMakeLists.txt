@@ -53,6 +53,8 @@ add_subdirectory(packages/jpeg)
 message(STATUS "JPEG_TARGET=${JPEG_TARGET}")
 add_subdirectory(packages/opendds)
 message(STATUS "OPENDDS_TARGET=${OPENDDS_TARGET}")
+add_subdirectory(packages/opencv)
+message(STATUS "OPENDDS_TARGET=${OPENCV_TARGET}")
 
 if(BUILD_PLATFORM MATCHES "ubuntu_x86-64")
     add_custom_target(
@@ -60,6 +62,7 @@ if(BUILD_PLATFORM MATCHES "ubuntu_x86-64")
         DEPENDS ${ZLIB_TARGET}
         DEPENDS ${JPEG_TARGET}
         DEPENDS ${OPENDDS_TARGET}
+        DEPENDS ${OPENCV_TARGET}
         )
 endif()
 

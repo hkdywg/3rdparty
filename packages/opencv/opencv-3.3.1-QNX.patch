@@ -1,0 +1,69 @@
+diff --color -upr opencv-3.3.1/3rdparty/carotene/CMakeLists.txt opencv-3.3.1-new/3rdparty/carotene/CMakeLists.txt
+--- opencv-3.3.1/3rdparty/carotene/CMakeLists.txt	2017-10-23 23:41:12.000000000 +0800
++++ opencv-3.3.1-new/3rdparty/carotene/CMakeLists.txt	2021-05-24 18:17:29.458095830 +0800
+@@ -21,7 +21,11 @@ if(CMAKE_COMPILER_IS_GNUCC)
+     # - goodFeaturesToTrack 10-20%
+     # - cornerHarris 30% for some cases
+ 
+-    set_source_files_properties(${carotene_sources} COMPILE_FLAGS "--param ipcp-unit-growth=100000 --param inline-unit-growth=100000 --param large-stack-frame-growth=5000")
++    if (CMAKE_SYSTEM_NAME STREQUAL "QNX")
++        set_source_files_properties(${carotene_sources} COMPILE_FLAGS "-Wc,--param,ipcp-unit-growth=100000 -Wc,--param,inline-unit-growth=100000 -Wc,--param,large-stack-frame-growth=5000")
++    else ()
++        set_source_files_properties(${carotene_sources} COMPILE_FLAGS "--param ipcp-unit-growth=100000 --param inline-unit-growth=100000 --param large-stack-frame-growth=5000")
++    endif()
+ endif()
+ 
+ add_library(carotene_objs OBJECT
+diff --color -upr opencv-3.3.1/3rdparty/carotene/hal/CMakeLists.txt opencv-3.3.1-new/3rdparty/carotene/hal/CMakeLists.txt
+--- opencv-3.3.1/3rdparty/carotene/hal/CMakeLists.txt	2017-10-23 23:41:12.000000000 +0800
++++ opencv-3.3.1-new/3rdparty/carotene/hal/CMakeLists.txt	2021-05-24 18:17:29.458095830 +0800
+@@ -90,8 +90,12 @@ set_property(DIRECTORY APPEND PROPERTY C
+     #   matchTemplate about 5-10%
+     #   goodFeaturesToTrack 10-20%
+     #   cornerHarris 30% for some cases
+-    set_source_files_properties(impl.cpp $<TARGET_OBJECTS:carotene_objs> COMPILE_FLAGS "--param ipcp-unit-growth=100000 --param inline-unit-growth=100000 --param large-stack-frame-growth=5000")
++    if (CMAKE_SYSTEM_NAME STREQUAL "QNX")
++        set_source_files_properties(impl.cpp $<TARGET_OBJECTS:carotene_objs> COMPILE_FLAGS "-Wc,--param,ipcp-unit-growth=100000 -Wc,--param,inline-unit-growth=100000 -Wc,--param,large-stack-frame-growth=5000")
+ #    set_source_files_properties(impl.cpp $<TARGET_OBJECTS:carotene_objs> COMPILE_FLAGS "--param ipcp-unit-growth=100000 --param inline-unit-growth=100000 --param large-stack-frame-growth=5000")
++    else ()
++        set_source_files_properties(impl.cpp $<TARGET_OBJECTS:carotene_objs> COMPILE_FLAGS "--param ipcp-unit-growth=100000 --param inline-unit-growth=100000 --param large-stack-frame-growth=5000")
++    endif ()
+   endif()
+ 
+ add_library(tegra_hal STATIC $<TARGET_OBJECTS:carotene_objs>)
+diff --color -upr opencv-3.3.1/CMakeLists.txt opencv-3.3.1-new/CMakeLists.txt
+--- opencv-3.3.1/CMakeLists.txt	2017-12-07 23:46:58.000000000 +0800
++++ opencv-3.3.1-new/CMakeLists.txt	2021-05-24 18:17:29.458095830 +0800
+@@ -548,6 +548,8 @@ if(UNIX)
+       set(OPENCV_LINKER_LIBS ${OPENCV_LINKER_LIBS} dl m log)
+     elseif(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD|NetBSD|DragonFly|OpenBSD|Haiku")
+       set(OPENCV_LINKER_LIBS ${OPENCV_LINKER_LIBS} m pthread)
++    elseif(${CMAKE_SYSTEM_NAME} MATCHES "QNX")
++      set(OPENCV_LINKER_LIBS ${OPENCV_LINKER_LIBS} m)
+     elseif(EMSCRIPTEN)
+       # no need to link to system libs with emscripten
+     else()
+diff --color -upr opencv-3.3.1/modules/core/src/system.cpp opencv-3.3.1-new/modules/core/src/system.cpp
+--- opencv-3.3.1/modules/core/src/system.cpp	2017-10-23 23:41:12.000000000 +0800
++++ opencv-3.3.1-new/modules/core/src/system.cpp	2021-05-24 18:15:52.044106763 +0800
+@@ -462,7 +462,7 @@ struct HWFeatures
+         CV_UNUSED(cpuid_data_ex);
+     #endif // OPENCV_HAVE_X86_CPUID
+ 
+-    #if defined __ANDROID__ || defined __linux__
++    #if defined __ANDROID__ || defined __linux__ || defined __QNX__
+     #ifdef __aarch64__
+         have[CV_CPU_NEON] = true;
+         have[CV_CPU_FP16] = true;
+diff --color -upr opencv-3.3.1/opencv_contrib-3.3.1/modules/sfm/src/libmv_light/libmv/numeric/numeric.h opencv-3.3.1-new/opencv_contrib-3.3.1/modules/sfm/src/libmv_light/libmv/numeric/numeric.h
+--- opencv-3.3.1/opencv_contrib-3.3.1/modules/sfm/src/libmv_light/libmv/numeric/numeric.h	2017-10-18 22:51:04.000000000 +0800
++++ opencv-3.3.1-new/opencv_contrib-3.3.1/modules/sfm/src/libmv_light/libmv/numeric/numeric.h	2021-05-24 18:17:29.458095830 +0800
+@@ -35,7 +35,7 @@
+ 
+ #if !defined(__MINGW64__)
+ #  if defined(_WIN32) || defined(__APPLE__) || \
+-      defined(__FreeBSD__) || defined(__NetBSD__)
++      defined(__FreeBSD__) || defined(__NetBSD__) || defined(__QNX__)
+ static void sincos(double x, double *sinx, double *cosx) {
+   *sinx = sin(x);
+   *cosx = cos(x);
