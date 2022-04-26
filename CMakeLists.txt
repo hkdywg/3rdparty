@@ -51,12 +51,15 @@ add_subdirectory(packages/zlib)
 message(STATUS "ZLIB_TARGET=${ZLIB_TARGET}")
 add_subdirectory(packages/jpeg)
 message(STATUS "JPEG_TARGET=${JPEG_TARGET}")
+add_subdirectory(packages/opendds)
+message(STATUS "OPENDDS_TARGET=${OPENDDS_TARGET}")
 
 if(BUILD_PLATFORM MATCHES "ubuntu_x86-64")
     add_custom_target(
         ALL
         DEPENDS ${ZLIB_TARGET}
         DEPENDS ${JPEG_TARGET}
+        DEPENDS ${OPENDDS_TARGET}
         )
 endif()
 

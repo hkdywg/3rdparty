@@ -1,0 +1,83 @@
+if(NOT OPENDDS_VERSION)
+    set(OPENDDS_VERSION "3.16")
+endif()
+
+set(OPENDDS_PACKAGE_NAME "OpenDDS-${OPENDDS_VERSION}")
+set(OPENDDS_PACKAGE_PATH "${CMAKE_CURRENT_LIST_DIR}/${OPENDDS_PACKAGE_NAME}.tar.bz2")
+set(OPENDDS_PREFIX ${THIRDPARTY_ROOT}/build/install)
+
+GENERATE_PATCH_COMMAND(OPENDDS_PACKAGE_PATCH_CMD ${OPENDDS_PACKAGE_NAME})
+
+unset(OPENDDS_ENV_COMMAND)
+list(APPEND OPENDDS_ENV_COMMAND "unset")
+list(APPEND OPENDDS_ENV_COMMAND "CC CFLAGS CXX CXXFLAGS AR NM STRIP RANLIBO BJDUMP LDFLAGS")
+list(APPEND OPENDDS_ENV_COMMAND "$<SEMICOLON>")
+
+if(CMAKE_CROSSCOMPILING)
+    list(APPEND OPENDDS_ENV_COMMAND "export")
+    list(APPEND OPENDDS_ENV_COMMAND "CFLAGS=\"-Wno-all -Wno-deprecated-declarations -Wno-implicit-fallthrough -Wno-stringop-owerflow\"")
+    list(APPEND OPENDDS_ENV_COMMAND "CCFLAGS=\"-Wno-all -Wno-deprecated-declarations -Wno-implicit-fallthrough -Wno-stringop-owerflow\"")
+    list(APPEND OPENDDS_ENV_COMMAND "CXXFLAGS=\"-Wno-all -Wno-deprecated-declarations -Wno-implicit-fallthrough -Wno-stringop-owerflow\"")
+    list(APPEND OPENDDS_ENV_COMMAND "CPPFLAGS=\"-Wno-all -Wno-deprecated-declarations -Wno-implicit-fallthrough -Wno-stringop-owerflow\"")
+    list(APPEND OPENDDS_ENV_COMMAND "$<SEMICOLON>")
+endif()
+
+unset(OPENDDS_CFG_COMMAND)
+list(APPEND OPENDDS_CFG_COMMAND "${OPENDDS_ENV_COMMAND}")
+list(APPEND OPENDDS_CFG_COMMAND "./configure")
+list(APPEND OPENDDS_CFG_COMMAND "--optimize")
+list(APPEND OPENDDS_CFG_COMMAND "--no-tests")
+list(APPEND OPENDDS_CFG_COMMAND "--std=c++11")
+#list(APPEND OPENDDS_CFG_COMMAND "--xerces3=${XERCESC_PREFIX}")
+
+unset(OPENDDS_BUILD_COMMAND)
+list(APPEND OPENDDS_BUILD_COMMAND "${OPENDDS_ENV_COMMAND}")
+list(APPEND OPENDDS_BUILD_COMMAND "$(MAKE)")
+list(APPEND OPENDDS_BUILD_COMMAND "${VERBOSE_MAKEFILE}")
+
+unset(OPENDDS_INSTALL_COMMAND)
+list(APPEND OPENDDS_INSTALL_COMMAND "${OPENDDS_ENV_COMMAND}")
+
+if(CMAKE_CROSSCOMPILING)
+    configure_file(
+            ${CMAKE_CURRENT_LIST_DIR}/cross_g++.bash
+            ${CMAKE_CURRENT_BINARY_DIR}/cross-g++
+            @ONLY
+        )
+    list(APPEND OPENDDS_CFG_COMMAND "--host=linux")
+    list(APPEND OPENDDS_CFG_COMMAND "--compiler=g++")
+    list(APPEND OPENDDS_CFG_COMMAND "--target=linux-cross")
+    list(APPEND OPENDDS_CFG_COMMAND "--target-compiler=${CMAKE_CURRENT_BINARY_DIR}/cross-g++")
+    list(APPEND OPENDDS_CFG_COMMAND "pushd build/host && $(MAKE) install INSTALL_PREFIX=${OPENDDS_PREFIX} && popd")
+    list(APPEND OPENDDS_CFG_COMMAND "$<SEMICOLON>")
+    list(APPEND OPENDDS_CFG_COMMAND "pushd build/target && $(MAKE) install INSTALL_PREFIX=${OPENDDS_PREFIX} && popd")
+endif()
+
+
+string(REPLACE ";" " " OPENDDS_CFG_COMMAND "${OPENDDS_CFG_COMMAND}")
+string(REPLACE ";" " " OPENDDS_BUILD_COMMAND "${OPENDDS_BUILD_COMMAND}")
+string(REPLACE ";" " " OPENDDS_INSTALL_COMMAND "${OPENDDS_INSTALL_COMMAND}")
+
+
+find_package(OPENDDS ${OPENDDS_VERSION} EXACT QUIET)
+
+set(OPENDDS_TARGET ${OPENDDS_PACKAGE_NAME})
+
+THIRDPARTY_CACHE_SEARCH(opendds ${OPENDDS_PACKAGE_NAME})
+if(${OPENDDS_PACKAGE_NAME}_CACHE_FOUND)
+    ExternalProject_Add(
+            ${OPENDDS_PACKAGE_NAME}
+            URL ${OPENDDS_PACKAGE_PATH}
+            PATCH_COMMAND "${OPENDDS_PACKAGE_PATCH_CMD}"
+            CONFIGURE_COMMAND bash -c "${OPENDDS_CFG_COMMAND}"
+            BUILD_IN_SOURCE TRUE
+            BUILD_COMMAND bash -c "${OPENDDS_BUILD_COMMAND}"
+            INSTALL_COMMAND bash -c "${OPENDDS_INSTALL_COMMAND}"
+        )
+endif()
+
+add_custom_target(opendds DEPENDS ${OPENDDS_PACKAGE_NAME})
+
+set(OPENDDS_PREFIX ${OPENDDS_PREFIX} PARENT_SCOPE)
+set(OPENDDS_TARGET ${OPENDDS_TARGET} PARENT_SCOPE)
+

@@ -1,0 +1,3 @@
+#!/bin/bash -e
+
+@CMAKE_C_COMPILER@ -V@CMAKE_C_COMPILER_TARGET@ $*
