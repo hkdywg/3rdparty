@@ -1,0 +1,2 @@
+export THIRDPARTY_ROOT=/home/yinwg/ywg_workspace/lib
+export PATH=$PATH:/opt/poky/3.0.2/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux

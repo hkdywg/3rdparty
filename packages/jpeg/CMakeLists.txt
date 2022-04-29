@@ -7,11 +7,16 @@ set(JPEG_PREFIX ${THIRDPARTY_INSTALL_PATH})
 
 GENERATE_PATCH_COMMAND(JPEG_PACKAGE_PATCH_CMD ${JPEG_PACKAGE_NAME})
 
+message(STATUS "CMAKE_CROSSCOMPILING=${CMAKE_CROSSCOMPILING}")
+
 if(CMAKE_CROSSCOMPILING)
-    set(JPEG_CONFIGURE_COMMAND ../${JPEG_PACKAGE_NAME}/configure --host=${AUTOTOOL_HOST} --prefix=${JPEG_PREFIX} --enable-static --enable-shared --disable-silent-rules)
+    set(CFLAGS "CFLAGS=--sysroot=${CMAKE_SYSROOT}")
 else()
     set(JPEG_CONFIGURE_COMMAND ../${JPEG_PACKAGE_NAME}/configure --prefix=${JPEG_PREFIX} --enable-static --disable-cli --enable-shared --disable-silent-rules)
 endif()
+
+message(STATUS "JPEG_CONFIGURE_COMMAND=${JPEG_CONFIGURE_COMMAND}")
+message(STATUS "PATH=$ENV{PATH}")
 
 find_package(JPEG ${JPEG_VERSION} EXACT QUIET)
 THIRDPARTY_CACHE_SEARCH(${JPEG_TARGET} ${JPEG_PACKAGE_NAME})

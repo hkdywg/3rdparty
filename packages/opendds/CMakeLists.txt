@@ -28,6 +28,7 @@ list(APPEND OPENDDS_CFG_COMMAND "./configure")
 list(APPEND OPENDDS_CFG_COMMAND "--optimize")
 list(APPEND OPENDDS_CFG_COMMAND "--no-tests")
 list(APPEND OPENDDS_CFG_COMMAND "--std=c++11")
+
 #list(APPEND OPENDDS_CFG_COMMAND "--xerces3=${XERCESC_PREFIX}")
 
 unset(OPENDDS_BUILD_COMMAND)
@@ -40,24 +41,30 @@ list(APPEND OPENDDS_INSTALL_COMMAND "${OPENDDS_ENV_COMMAND}")
 
 if(CMAKE_CROSSCOMPILING)
     configure_file(
-            ${CMAKE_CURRENT_LIST_DIR}/cross_g++.bash
+            ${CMAKE_CURRENT_LIST_DIR}/cross-g++.bash
             ${CMAKE_CURRENT_BINARY_DIR}/cross-g++
+            @ONLY
+        )
+
+    configure_file(
+            ${CMAKE_CURRENT_LIST_DIR}/cross-gcc.bash
+            ${CMAKE_CURRENT_BINARY_DIR}/cross-gcc
             @ONLY
         )
     list(APPEND OPENDDS_CFG_COMMAND "--host=linux")
     list(APPEND OPENDDS_CFG_COMMAND "--compiler=g++")
-    list(APPEND OPENDDS_CFG_COMMAND "--target=linux-cross")
+    list(APPEND OPENDDS_CFG_COMMAND "--target=linux-cross --force-ace-tao")
     list(APPEND OPENDDS_CFG_COMMAND "--target-compiler=${CMAKE_CURRENT_BINARY_DIR}/cross-g++")
-    list(APPEND OPENDDS_CFG_COMMAND "pushd build/host && $(MAKE) install INSTALL_PREFIX=${OPENDDS_PREFIX} && popd")
-    list(APPEND OPENDDS_CFG_COMMAND "$<SEMICOLON>")
-    list(APPEND OPENDDS_CFG_COMMAND "pushd build/target && $(MAKE) install INSTALL_PREFIX=${OPENDDS_PREFIX} && popd")
+    list(APPEND OPENDDS_INSTALL_COMMAND "pushd build/host && $(MAKE) install INSTALL_PREFIX=${OPENDDS_PREFIX}/host && popd")
+    list(APPEND OPENDDS_INSTALL_COMMAND "$<SEMICOLON>")
+    list(APPEND OPENDDS_INSTALL_COMMAND "pushd build/target && $(MAKE) install INSTALL_PREFIX=${OPENDDS_PREFIX} && popd")
 endif()
 
+message(STATUS "OPENDDS_CFG_COMMAND=${OPENDDS_CFG_COMMAND}")
 
 string(REPLACE ";" " " OPENDDS_CFG_COMMAND "${OPENDDS_CFG_COMMAND}")
 string(REPLACE ";" " " OPENDDS_BUILD_COMMAND "${OPENDDS_BUILD_COMMAND}")
 string(REPLACE ";" " " OPENDDS_INSTALL_COMMAND "${OPENDDS_INSTALL_COMMAND}")
-
 
 find_package(OPENDDS ${OPENDDS_VERSION} EXACT QUIET)
 
@@ -75,6 +82,7 @@ if(${OPENDDS_PACKAGE_NAME}_CACHE_FOUND)
             INSTALL_COMMAND bash -c "${OPENDDS_INSTALL_COMMAND}"
         )
 endif()
+
 
 add_custom_target(opendds DEPENDS ${OPENDDS_PACKAGE_NAME})
 

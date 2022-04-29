@@ -8,9 +8,14 @@ GENERATE_PATCH_COMMAND(ZLIB_PACKAGE_PATCH_CMD ${ZLIB_PACKAGE_NAME})
 
 find_package(ZLIB ${ZLIB_VERSION} EXACT QUIET)
 
-set(ZLIB_TARGET ${ZLIB_PACKAGE_NAME})
+set(ZLIB_TARGET zlib)
 
-add_custom_target(${ZLIB_TARGET})
+ExternalProject_Add(
+            ${ZLIB_PACKAGE_NAME}
+            URL ${ZLIB_PACKAGE_PATH}
+            PATCH_COMMAND "${ZLIB_PACKAGE_PATCH_CMD}"
+            BUILD_COMMAND $(MAKE) ${VERBOSE_MAKEFILE} -j${PROCESSORS_NUMBER}
+    )
 
 add_custom_target(zlib DEPENDS ${ZLIB_TARGET})
 
