@@ -12,12 +12,14 @@ set(BUILD_PLATFORM "v3h_aarch64")
 
 # Set cross compiler tool path
 if(ENV{CROSS_TOOL_CHAIN_PATH})
-    set(TOOLCHAIN_PATH $ENV{CROSS_TOOL_CHAIN_PATH})
+    set(CROSS_TOOLCHAIN_ROOT_PATH $ENV{CROSS_TOOL_CHAIN_PATH})
 else()
-    set(CMAKE_SYSROOT /opt/poky/3.0.2/sysroots/aarch64-poky-linux)
-    set(CMAKE_FIND_ROOT_PATH ${CMAKE_SYSROOT})
-    set(TOOLCHAIN_PATH /opt/poky/3.0.2/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux)
+    set(CROSS_TOOLCHAIN_ROOT_PATH /opt/poky/3.0.2/sysroots)
 endif()
+
+set(CMAKE_SYSROOT ${CROSS_TOOLCHAIN_ROOT_PATH}/aarch64-poky-linux)
+set(CMAKE_FIND_ROOT_PATH ${CMAKE_SYSROOT})
+set(TOOLCHAIN_PATH ${CROSS_TOOLCHAIN_ROOT_PATH}/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux)
 
 message(STATUS "TOOLCHAIN_PATH = ${TOOLCHAIN_PATH}")
 

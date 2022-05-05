@@ -11,9 +11,11 @@ message(STATUS "CMAKE_CROSSCOMPILING=${CMAKE_CROSSCOMPILING}")
 
 if(CMAKE_CROSSCOMPILING)
     set(CFLAGS "CFLAGS=--sysroot=${CMAKE_SYSROOT}")
+    set(JPEG_CONFIGURE_COMMAND ../${JPEG_PACKAGE_NAME}/configure --host=${AUTOTOOL_HOST} --prefix=${JPEG_PREFIX} --enable-static --enable-shared --disable-silent-rules ${CFLAGS})
 else()
     set(JPEG_CONFIGURE_COMMAND ../${JPEG_PACKAGE_NAME}/configure --prefix=${JPEG_PREFIX} --enable-static --disable-cli --enable-shared --disable-silent-rules)
 endif()
+
 
 message(STATUS "JPEG_CONFIGURE_COMMAND=${JPEG_CONFIGURE_COMMAND}")
 message(STATUS "PATH=$ENV{PATH}")

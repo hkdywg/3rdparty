@@ -32,6 +32,7 @@ if(BUILD_PLATFORM STREQUAL "v3h_aarch64")
     set(CMAKE_CROSS_TOOLS_PATH /opt/poky/3.0.2/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux)
     set(CMAKE_C_COMPILER ${CMAKE_CROSS_TOOLS_PATH}/aarch64-poky-linux-gcc)
     set(CMAKE_CXX_COMPILER ${CMAKE_CROSS_TOOLS_PATH}/aarch64-poky-linux-g++)
+    set(CROSS_TOOLCHAIN_CONFIG_FILE ${CMAKE_CURRENT_LIST_DIR}/config/platform/Linux_Renesas_aarch64.cmake)
     message(STATUS "BUILD_PLATFORM=${BUILD_PLATFORM}")
 endif()
 
@@ -70,9 +71,6 @@ add_subdirectory(packages/opencv)
 message(STATUS "OPENDDS_TARGET=${OPENCV_TARGET}")
 
 message(STATUS "CMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
-
-
-add_subdirectory(src)
 
 if(BUILD_PLATFORM MATCHES "ubuntu_x86-64")
     add_custom_target(
