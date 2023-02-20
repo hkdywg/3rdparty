@@ -1,0 +1,35 @@
+if(NOT OPENSSL_VERSION)
+    set(OPENSSL_VERSION 1.1.1j)
+endif()
+
+set(OPENSSL_PACKAGE_NAME openssl-${OPENSSL_VERSION})
+set(OPENSSL_PACKAGE_PATH
+    ${PROJECT_SOURCE_DIR}/packages/openssl/${OPENSSL_PACKAGE_NAME}.tar.bz2)
+
+set(OPENSSL_TARGET openssl)
+set(OPENSSL_PREFIX ${THIRDPARTY_INSTALL_PATH})
+
+generate_patch_command(OPENSSL_PACKAGE_PATCH_CMD ${OPENSSL_PACKAGE_NAME})
+
+set(OPENSSL_CONFIGURE_COMMAND
+    ../${OPENSSL_PACKAGE_NAME}/Configure no-asm shared
+    --prefix=${OPENSSL_PREFIX}
+    --openssldir=${OPENSSL_PREFIX}/lib/ssl linux-aarch64 && perl
+    configdata.pm -d)
+
+find_package(OpenSSL 1.1.1 EXACT QUIET)
+
+set(OPENSSL_TARGET ${OPENSSL_PACKAGE_NAME})
+        ExternalProject_Add(
+            ${OPENSSL_TARGET}
+            URL ${OPENSSL_PACKAGE_PATH}
+            PATCH_COMMAND "${OPENSSL_PACKAGE_PATCH_CMD}"
+            LIST_SEPARATOR |
+            CMAKE_ARGS
+            CONFIGURE_COMMAND ${OPENSSL_CONFIGURE_COMMAND}
+            BUILD_COMMAND $(MAKE) ${VERBOSE_MAKEFILE}
+            INSTALL_COMMAND $(MAKE) install_sw)
+
+
+set(OPENSSL_PREFIX ${OPENSSL_PREFIX} PARENT_SCOPE)
+set(OPENSSL_TARGET ${OPENSSL_TARGET} PARENT_SCOPE)

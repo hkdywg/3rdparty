@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.8.11)
 
+project(3rdparty)
+
 if(NOT THIRDPARTY_ROOT AND NOT DEFINED ENV{THIRDPARTY_ROOT})
     message(
             FATAL_ERROR
@@ -68,7 +70,9 @@ message(STATUS "JPEG_TARGET=${JPEG_TARGET}")
 add_subdirectory(packages/opendds)
 message(STATUS "OPENDDS_TARGET=${OPENDDS_TARGET}")
 add_subdirectory(packages/opencv)
-message(STATUS "OPENDDS_TARGET=${OPENCV_TARGET}")
+message(STATUS "OPENCV_TARGET=${OPENCV_TARGET}")
+add_subdirectory(packages/openssl)
+message(STATUS "OPENSSL_TARGET=${OPENSSL_TARGET}")
 
 message(STATUS "CMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
 
@@ -79,6 +83,7 @@ if(BUILD_PLATFORM MATCHES "ubuntu_x86-64")
         DEPENDS ${JPEG_TARGET}
         DEPENDS ${OPENDDS_TARGET}
         DEPENDS ${OPENCV_TARGET}
+        DEPENDS ${OPENSSL_TARGET}
         )
 elseif(BUILD_PLATFORM MATCHES "renesas_v3h_aarch64")
     add_custom_target(
@@ -87,7 +92,7 @@ elseif(BUILD_PLATFORM MATCHES "renesas_v3h_aarch64")
         DEPENDS ${JPEG_TARGET}
         DEPENDS ${OPENDDS_TARGET}
         DEPENDS ${OPENCV_TARGET}
-        DEPENDS test_main
+        DEPENDS ${OPENSSL_TARGET}
         )
 endif()
 
