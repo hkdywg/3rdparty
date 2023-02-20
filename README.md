@@ -13,11 +13,11 @@
 	 make
 
 > Compiling openssl requires root permission, execute the following command
-> sudo make openssl
+
+>   sudo make openssl-1.1.1.j
 
 ### Added
 ### Changed
-- ffmpeg x265 support
 ### Deprecated
 ### Removed
 ### Fixed
