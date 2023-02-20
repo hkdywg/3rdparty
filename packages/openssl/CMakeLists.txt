@@ -11,10 +11,11 @@ set(OPENSSL_PREFIX ${THIRDPARTY_INSTALL_PATH})
 
 generate_patch_command(OPENSSL_PACKAGE_PATCH_CMD ${OPENSSL_PACKAGE_NAME})
 
+    
 set(OPENSSL_CONFIGURE_COMMAND
-    ../${OPENSSL_PACKAGE_NAME}/Configure no-asm shared
+    ../${OPENSSL_PACKAGE_NAME}/Configure linux-aarch64 no-asm shared
     --prefix=${OPENSSL_PREFIX}
-    --openssldir=${OPENSSL_PREFIX}/lib/ssl linux-aarch64 && perl
+    --openssldir=${OPENSSL_PREFIX}/lib/ssl  && perl
     configdata.pm -d)
 
 find_package(OpenSSL 1.1.1 EXACT QUIET)
@@ -27,7 +28,7 @@ set(OPENSSL_TARGET ${OPENSSL_PACKAGE_NAME})
             LIST_SEPARATOR |
             CMAKE_ARGS
             CONFIGURE_COMMAND ${OPENSSL_CONFIGURE_COMMAND}
-            BUILD_COMMAND $(MAKE) ${VERBOSE_MAKEFILE}
+            BUILD_COMMAND $(MAKE) ${VERBOSE_MAKEFILE} -j${PROCESSORS_NUMBER}
             INSTALL_COMMAND $(MAKE) install_sw)
 
 
