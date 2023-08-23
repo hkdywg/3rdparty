@@ -73,6 +73,8 @@ add_subdirectory(packages/opencv)
 message(STATUS "OPENCV_TARGET=${OPENCV_TARGET}")
 add_subdirectory(packages/openssl)
 message(STATUS "OPENSSL_TARGET=${OPENSSL_TARGET}")
+add_subdirectory(packages/tslib)
+message(STATUS "TSLIB_TARGET=${TSLIB_TARGET}")
 
 message(STATUS "CMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
 
@@ -93,6 +95,7 @@ elseif(BUILD_PLATFORM MATCHES "renesas_v3h_aarch64")
         DEPENDS ${OPENDDS_TARGET}
         DEPENDS ${OPENCV_TARGET}
         DEPENDS ${OPENSSL_TARGET}
+        DEPENDS ${TSLIB_TARGET}
         )
 endif()
 
